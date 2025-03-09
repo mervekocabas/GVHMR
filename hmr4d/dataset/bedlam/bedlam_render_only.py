@@ -45,7 +45,8 @@ render_dict = {
 
 # Render and save the result
 rendered_img = simple_render_mesh_background(render_dict)
-save_video(rendered_img, "outputs/bedlam_render.png", crf=23)
+cv2.imwrite("outputs/bedlam_render.png", rendered_img)
+#save_video(rendered_img, "outputs/bedlam_render.png", crf=23)
 
 print("Rendering complete! Saved as 'bedlam_render.mp4'.")
 
