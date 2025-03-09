@@ -29,7 +29,7 @@ def load_image(img_path):
 # Load images in parallel using ThreadPoolExecutor
 with ThreadPoolExecutor() as executor:
     images = list(executor.map(load_image, image_filenames))
-
+import ipdb;ipdb.set_trace()
 # Remove None values (in case some images are missing)
 images = [img for img in images if img is not None]
 
