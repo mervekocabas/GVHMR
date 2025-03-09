@@ -237,7 +237,8 @@ class Renderer:
         if background is None:
             background = np.ones((self.height, self.width, 3)).astype(np.uint8) * 255
 
-        image = overlay_image_onto_background(image, mask, self.bboxes, background.copy())
+        #image = overlay_image_onto_background(image, mask, self.bboxes, background.copy())
+        image = overlay_image_onto_background(image, mask, self.bboxes, background.copy_())
         self.reset_bbox()
         return image
 
