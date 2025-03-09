@@ -48,6 +48,7 @@ def simple_render_mesh_solid_background(render_dict, VI=50, colors=[0.8, 0.8, 0.
 
     # If no background is provided, create a solid color background
     if background is None or len(background) == 0:
+        import ipdb;ipdb.set_trace()
         height, width = 512, 512  # Default size, adjust as needed
         # Create a solid color background for each frame
         background = [torch.full((3, height, width), bg_color[i], dtype=torch.uint8) for i in range(3)]
