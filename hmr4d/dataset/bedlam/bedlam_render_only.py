@@ -4,10 +4,38 @@ from pathlib import Path
 from hmr4d.utils.smplx_utils import make_smplx
 from hmr4d.utils.vis.renderer_utils import simple_render_mesh_background
 from hmr4d.utils.video_io_utils import read_video_np, save_video
+from concurrent.futures import ThreadPoolExecutor
+import cv2
 
 # Load BEDLAM data
 data_path = "inputs/bedlam_30fps/training_labels_30fps/20221010_3_1000_batch01hand.npz"
 data = np.load(data_path)
+
+# Base directory where images are stored
+image_base_dir = "inputs/data/b0_all/20221010_3_1000_batch01hand/png/"
+
+# Construct full image paths using NumPy string operations
+image_filenames = np.char.add(image_base_dir, data["imgnames"])  # Efficient path concatenation
+import ipdb;ipdb.set_trace()
+# Function to load a single image
+def load_image(img_path):
+    img = cv2.imread(img_path)  # Load in BGR format
+    if img is None:
+        print(f"Warning: Image not found")
+        return None
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # Convert to RGB
+    return torch.tensor(img, dtype=torch.uint8).permute(2, 0, 1)  # (H, W, C) → (C, H, W)
+
+# Load images in parallel using ThreadPoolExecutor
+with ThreadPoolExecutor() as executor:
+    images = list(executor.map(load_image, image_filenames))
+
+# Remove None values (in case some images are missing)
+images = [img for img in images if img is not None]
+
+# Convert to tensor batch if images exist
+images = torch.stack(images) if images else None
+import ipdb;ipdb.set_trace()
 
 # Extract required parameters
 betas = torch.tensor(data["betas"][0][:10], dtype=torch.float32)  # Shape coefficients (only first 10)
@@ -16,9 +44,7 @@ global_orient = torch.tensor(data["poses_cam"][0][:3], dtype=torch.float32)  # G
 transl = torch.tensor(data["trans_cam"][0], dtype=torch.float32)  # Translation
 
 # Create SMPL-X model
-import ipdb;ipdb.set_trace()
 smplx_model = make_smplx("supermotion")
-import ipdb;ipdb.set_trace()
 
 # Generate mesh
 smplx_out = smplx_model(
