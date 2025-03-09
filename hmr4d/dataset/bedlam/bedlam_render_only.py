@@ -10,12 +10,12 @@ import cv2
 # Load BEDLAM data
 data_path = "inputs/bedlam_30fps/training_labels_30fps/first_entry.npz"
 data = np.load(data_path)
-import ipdb;ipdb.set_trace()
+
 # Extract required parameters
-betas = torch.tensor(data["betas"][0][:10], dtype=torch.float32)  # Shape coefficients (only first 10)
-body_pose = torch.tensor(data["poses_cam"][0][3:66], dtype=torch.float32)  # Body pose (excluding global rotation)
-global_orient = torch.tensor(data["poses_cam"][0][:3], dtype=torch.float32)  # Global orientation
-transl = torch.tensor(data["trans_cam"][0], dtype=torch.float32)  # Translation
+betas = torch.tensor(data["betas"][:10], dtype=torch.float32)  # Shape coefficients (only first 10)
+body_pose = torch.tensor(data["poses_cam"][3:66], dtype=torch.float32)  # Body pose (excluding global rotation)
+global_orient = torch.tensor(data["poses_cam"][:3], dtype=torch.float32)  # Global orientation
+transl = torch.tensor(data["trans_cam"], dtype=torch.float32)  # Translation
 
 # Create SMPL-X model
 smplx_model = make_smplx("supermotion")
@@ -35,7 +35,7 @@ render_dict = {
     "verts": smplx_out.vertices,  # Generated vertices
     "background": None,  # Set this to an image if available
 }
-import ipdb;ipdb.set_trace()
+
 # Render and save the result
 rendered_img = simple_render_mesh_solid_background(render_dict)
 save_video(rendered_img, "outputs/bedlam_render.mp4", crf=23)
