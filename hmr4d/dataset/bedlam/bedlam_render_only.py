@@ -12,7 +12,7 @@ def data_loader(data_path, sequence_name):
 
     # Extract sequence-specific parameters from the data
     sequence_imgnames = [imgname for imgname in data["imgnames"] if sequence_name in imgname]
-    import ipdb;ipdb.set_trace()
+    
     # Extract parameters for SMPL-X
     betas = torch.tensor(data["betas"][:,:10], dtype=torch.float32)  # Shape coefficients (first 10)
     body_pose = torch.tensor(data["poses_cam"][:,3:66], dtype=torch.float32)  # Body pose (excluding global rotation)
@@ -23,7 +23,7 @@ def data_loader(data_path, sequence_name):
     smplx_model = make_smplx("supermotion")
 
     # Camera intrinsics (assuming these are shared across sequences)
-    K = torch.tensor(data["cam_int"]).unsqueeze(0)
+    K = torch.tensor(data["cam_int"][:1])
 
     return smplx_model, betas, body_pose, global_orient, transl, sequence_imgnames, K
 
@@ -66,16 +66,15 @@ def create_video(data_path, output_dir, fps=30, crf=17):
     
     # Read the sequence names from the .npz file (or can be inferred from image paths)
     data = np.load(data_path)
-    import ipdb;ipdb.set_trace()
     sequence_names = set([imgname.split("/")[0] for imgname in data["imgnames"]])
 
     # Process each sequence individually
     for sequence_name in sequence_names:
         print(f"Processing sequence: {sequence_name}")
-
+        
         # Load sequence-specific data
         smplx_model, betas, body_pose, global_orient, transl, sequence_imgnames, K = data_loader(data_path, sequence_name)
-        
+        import ipdb;ipdb.set_trace()
         frames = []
         
         # Render frames for the current sequence
