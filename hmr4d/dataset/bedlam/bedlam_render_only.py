@@ -35,7 +35,7 @@ render_dict = {
     "verts": smplx_out.vertices,  # Generated vertices
     "background": None,  # Set this to an image if available
 }
-
+import ipdb;ipdb.set_trace()
 # Render and save the result
 rendered_img = simple_render_mesh_solid_background(render_dict)
 save_video(rendered_img, "outputs/bedlam_render.mp4", crf=23)
