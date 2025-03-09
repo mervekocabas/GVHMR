@@ -16,7 +16,7 @@ image_base_dir = "inputs/data/b0_all/20221010_3_1000_batch01hand/png/"
 
 # Construct full image paths using NumPy string operations
 image_filenames = np.char.add(image_base_dir, data["imgnames"])  # Efficient path concatenation
-import ipdb;ipdb.set_trace()
+
 # Function to load a single image
 def load_image(img_path):
     img = cv2.imread(img_path)  # Load in BGR format
