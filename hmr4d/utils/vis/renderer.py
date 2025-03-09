@@ -32,7 +32,8 @@ def overlay_image_onto_background(image, mask, bbox, background):
     if isinstance(mask, torch.Tensor):
         mask = mask.detach().cpu().numpy()
 
-    out_image = background.copy()
+    #out_image = background.copy()
+    out_image = background.clone()
     bbox = bbox[0].int().cpu().numpy().copy()
     roi_image = out_image[bbox[1] : bbox[3], bbox[0] : bbox[2]]
 
