@@ -33,13 +33,14 @@ background_img_path = "inputs/data/b0_all/20221010_3_1000_batch01hand/png/seq_00
 image = cv2.imread(background_img_path)  # Load image with OpenCV
 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert to RGB (OpenCV loads as BGR)
 image = torch.tensor(image).permute(2, 0, 1).unsqueeze(0)  # Convert to tensor (C, H, W, 1 batch)
+image_np = image.squeeze(0).permute(1, 2, 0).cpu().numpy()  # Convert to (H, W, C) format and then to NumPy array
 
 # Prepare rendering input
 render_dict = {
     "K": torch.tensor(data["cam_int"]).unsqueeze(0),  # Camera intrinsics
     "faces": smplx_model.faces,  # SMPL-X mesh faces
     "verts": smplx_out.vertices,  # Generated vertices
-    "background": image,  # Set this to an image if available
+    "background": image_np,  # Set this to an image if available
 }
 
 # Render and save the result
