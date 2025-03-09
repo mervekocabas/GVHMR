@@ -49,7 +49,7 @@ def renderer(smplx_model, smpl_params_c, K, img_path):
         "verts": smplx_out.vertices,  # Generated vertices
         "background": background,  # Set this to an image if available
     }
-
+    import ipdb; ipdb.set_trace()
     # Render the image
     rendered_img = simple_render_mesh_background(render_dict)
     rendered_img = rendered_img.squeeze(0)  # Remove the batch dimension
