@@ -77,16 +77,21 @@ def create_video(data_path, output_dir, fps=30, crf=17, batch_size=32):
             batch_imgnames = sequence_imgnames[i:i+batch_size]  # Get a batch of image paths
             batch_frames = []
 
-            for img_path in batch_imgnames:
-                # Render the current frame
-                img_path = Path("inputs/data/b0_all/20221010_3_1000_batch01hand/png") / img_path
-                rendered_img = renderer(smplx_model, smpl_params_c, K, img_path)
-                rendered_img = np.clip(rendered_img, 0, 255).astype(np.uint8)  # Ensure image is in uint8 format
+            for j, img_path in enumerate(batch_imgnames):
+                # Extract only the parameters for the current frame
+                smpl_params_single = {
+                    "body_pose": smpl_params_c["body_pose"][i + j].unsqueeze(0),
+                    "betas": smpl_params_c["betas"][i + j].unsqueeze(0),
+                    "transl": smpl_params_c["transl"][i + j].unsqueeze(0),
+                    "global_orient": smpl_params_c["global_orient"][i + j].unsqueeze(0),
+                }
 
-                # Append the rendered image to the batch list
+                img_path = Path("inputs/data/b0_all/20221010_3_1000_batch01hand/png") / img_path
+                rendered_img = renderer(smplx_model, smpl_params_single, K, img_path)
+                #rendered_img = np.clip(rendered_img, 0, 255).astype(np.uint8)
+
                 batch_frames.append(rendered_img)
 
-            # Append the batch of frames to the overall frames list
             frames.extend(batch_frames)
 
         # Define the output path for the video of the current sequence
