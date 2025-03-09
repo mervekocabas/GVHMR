@@ -18,14 +18,14 @@ def data_loader(data_path, sequence_name):
     body_pose = torch.tensor(data["poses_cam"][:,3:66], dtype=torch.float32)  # Body pose (excluding global rotation)
     global_orient = torch.tensor(data["poses_cam"][:,:3], dtype=torch.float32)  # Global orientation
     transl = torch.tensor(data["trans_cam"] + data["cam_ext"][:, :3, 3], dtype=torch.float32)  # Translation
-
+    smpl_params_c = {"body_pose": body_pose, "betas": betas, "transl": transl, "global_orient": global_orient}
     # Create SMPL-X model
     smplx_model = make_smplx("supermotion")
 
     # Camera intrinsics (assuming these are shared across sequences)
     K = torch.tensor(data["cam_int"][:1])
 
-    return smplx_model, betas, body_pose, global_orient, transl, sequence_imgnames, K
+    return smplx_model, smpl_params_c, sequence_imgnames, K
 
 def load_background_image(image_path):
     """Load and process the background image."""
@@ -34,16 +34,11 @@ def load_background_image(image_path):
     image = torch.tensor(image).permute(2, 0, 1).unsqueeze(0)  # Convert to tensor (C, H, W, 1 batch)
     return image.squeeze(0).permute(1, 2, 0).cpu().numpy()  # Convert to NumPy array (H, W, C)
 
-def renderer(smplx_model, betas, body_pose, global_orient, transl, K, img_path):
+def renderer(smplx_model, smpl_params_c, K, img_path):
     """Render a single frame."""
     import ipdb;ipdb.set_trace()
     # Generate mesh for the current frame
-    smplx_out = smplx_model(
-        betas=betas.unsqueeze(0), 
-        body_pose=body_pose.unsqueeze(0), 
-        global_orient=global_orient.unsqueeze(0), 
-        transl=transl.unsqueeze(0)
-    )
+    smplx_out = smplx_model(**smpl_params_c)
     
     # Load the corresponding background image
     background = load_background_image(img_path)
@@ -74,7 +69,7 @@ def create_video(data_path, output_dir, fps=30, crf=17):
         print(f"Processing sequence: {sequence_name}")
         
         # Load sequence-specific data
-        smplx_model, betas, body_pose, global_orient, transl, sequence_imgnames, K = data_loader(data_path, sequence_name)
+        smplx_model, smpl_params_c, sequence_imgnames, K = data_loader(data_path, sequence_name)
         frames = []
         
         # Render frames for the current sequence
@@ -82,7 +77,7 @@ def create_video(data_path, output_dir, fps=30, crf=17):
             # Render the current frame
             img_path = Path("inputs/data/b0_all/20221010_3_1000_batch01hand/png") / img_path
             import ipdb;ipdb.set_trace()
-            rendered_img = renderer(smplx_model, betas, body_pose, global_orient, transl, K, img_path)
+            rendered_img = renderer(smplx_model, smpl_params_c, K, img_path)
             rendered_img = np.clip(rendered_img, 0, 255).astype(np.uint8)  # Ensure image is in uint8 format
 
             # Append the rendered image to the frames list
