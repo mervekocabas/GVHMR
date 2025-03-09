@@ -74,12 +74,12 @@ def create_video(data_path, output_dir, fps=30, crf=17):
         
         # Load sequence-specific data
         smplx_model, betas, body_pose, global_orient, transl, sequence_imgnames, K = data_loader(data_path, sequence_name)
-        import ipdb;ipdb.set_trace()
         frames = []
         
         # Render frames for the current sequence
         for img_path in sequence_imgnames:
             # Render the current frame
+            img_path = Path("inputs/data/b0_all/20221010_3_1000_batch01hand/png") / img_path
             rendered_img = renderer(smplx_model, betas, body_pose, global_orient, transl, K, img_path)
             rendered_img = np.clip(rendered_img, 0, 255).astype(np.uint8)  # Ensure image is in uint8 format
 
