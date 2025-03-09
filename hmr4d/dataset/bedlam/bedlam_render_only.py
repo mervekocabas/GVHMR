@@ -13,10 +13,10 @@ data = np.load(data_path)
 
 # Extract required parameters
 betas = torch.tensor(data["betas"][:10], dtype=torch.float32)  # Shape coefficients (only first 10)
-body_pose = torch.tensor(data["poses_cam"][3:66], dtype=torch.float32)  # Body pose (excluding global rotation)
-global_orient = torch.tensor(data["poses_cam"][:3], dtype=torch.float32)  # Global orientation
-transl = torch.tensor(data["trans_cam"], dtype=torch.float32)  # Translation
-
+body_pose = torch.tensor(data["poses_cam"][:, 3:66], dtype=torch.float32)  # Body pose (excluding global rotation)
+global_orient = torch.tensor(data["poses_cam"][:, :3], dtype=torch.float32)  # Global orientation
+transl = torch.tensor(data["trans_cam"]+data["cam_ext"][:3, 3], dtype=torch.float32)  # Translation
+import ipdb;ipdb.set_trace()
 # Create SMPL-X model
 smplx_model = make_smplx("supermotion")
 
