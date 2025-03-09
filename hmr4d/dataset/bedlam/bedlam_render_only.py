@@ -10,7 +10,7 @@ import cv2
 # Load BEDLAM data
 data_path = "inputs/bedlam_30fps/training_labels_30fps/first_entry.npz"
 data = np.load(data_path)
-
+import ipdb;ipdb.set_trace()
 # Extract required parameters
 betas = torch.tensor(data["betas"][0][:10], dtype=torch.float32)  # Shape coefficients (only first 10)
 body_pose = torch.tensor(data["poses_cam"][0][3:66], dtype=torch.float32)  # Body pose (excluding global rotation)
