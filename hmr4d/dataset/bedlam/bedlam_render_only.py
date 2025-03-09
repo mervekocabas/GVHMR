@@ -56,7 +56,7 @@ def renderer(smplx_model, smpl_params_c, K, img_path):
 
     return rendered_img
 
-def create_video(data_path, output_dir, fps=30, crf=17, batch_size=32):
+def create_video(data_path, output_dir, fps=30, crf=17):
     """Load data, render frames, and create a video for each sequence."""
     
     # Read the sequence names from the .npz file (or can be inferred from image paths)
@@ -72,8 +72,8 @@ def create_video(data_path, output_dir, fps=30, crf=17, batch_size=32):
         frames = []
 
         # Render frames in batches
-        for i in range(0, len(sequence_imgnames), batch_size):
-            batch_imgnames = sequence_imgnames[i:i+batch_size]  # Get a batch of image paths
+        for i in range(0, len(sequence_imgnames)):
+            batch_imgnames = sequence_imgnames[i:i+1]  # Get a batch of image paths
             batch_frames = []
 
             for j, img_path in enumerate(batch_imgnames):
@@ -103,7 +103,7 @@ def create_video(data_path, output_dir, fps=30, crf=17, batch_size=32):
 # Example usage
 data_path = "inputs/bedlam_30fps/training_labels_30fps/20221010_3_1000_batch01hand.npz"
 output_dir = "outputs/bedlam_render_videos"
-create_video(data_path, output_dir, fps=30, crf=17, batch_size=10)
+create_video(data_path, output_dir, fps=30, crf=17)
 
 '''
 #render only one image
