@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from pathlib import Path
 from hmr4d.utils.smplx_utils import make_smplx
-from hmr4d.utils.vis.renderer_utils import simple_render_mesh_background, simple_render_mesh_solid_background
+from hmr4d.utils.vis.renderer_utils import simple_render_mesh_background
 from hmr4d.utils.video_io_utils import read_video_np, save_video
 from concurrent.futures import ThreadPoolExecutor
 import cv2
@@ -28,16 +28,22 @@ smplx_out = smplx_model(
     transl=transl.unsqueeze(0)
 )
 
+# Load and process the background image
+background_img_path = "inputs/data/b0_all/20221010_3_1000_batch01hand/png/seq_000000/seq_000000_0000.png"  # Provide the path to your image
+image = cv2.imread(background_img_path)  # Load image with OpenCV
+image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert to RGB (OpenCV loads as BGR)
+image = torch.tensor(image).permute(2, 0, 1).unsqueeze(0)  # Convert to tensor (C, H, W, 1 batch)
+
 # Prepare rendering input
 render_dict = {
     "K": torch.tensor(data["cam_int"][0]).unsqueeze(0),  # Camera intrinsics
     "faces": smplx_model.faces,  # SMPL-X mesh faces
     "verts": smplx_out.vertices,  # Generated vertices
-    "background": None,  # Set this to an image if available
+    "background": image,  # Set this to an image if available
 }
 
 # Render and save the result
-rendered_img = simple_render_mesh_solid_background(render_dict)
+rendered_img = simple_render_mesh_background(render_dict)
 save_video(rendered_img, "outputs/bedlam_render.mp4", crf=23)
 
 print("Rendering complete! Saved as 'bedlam_render.mp4'.")
