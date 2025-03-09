@@ -45,6 +45,7 @@ render_dict = {
 
 # Render and save the result
 rendered_img = simple_render_mesh_background(render_dict)
+rendered_img = rendered_img.squeeze(0)  # This will remove the first dimension (1)
 print(rendered_img.shape)
 cv2.imwrite("outputs/bedlam_render.png", rendered_img)
 #save_video(rendered_img, "outputs/bedlam_render.png", crf=23)
