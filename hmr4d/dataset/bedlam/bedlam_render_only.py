@@ -18,6 +18,7 @@ transl = torch.tensor(data["trans_cam"][0], dtype=torch.float32)  # Translation
 # Create SMPL-X model
 import ipdb;ipdb.set_trace()
 smplx_model = make_smplx("supermotion")
+import ipdb;ipdb.set_trace()
 
 # Generate mesh
 smplx_out = smplx_model(
