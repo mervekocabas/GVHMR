@@ -12,12 +12,11 @@ data_path = "inputs/bedlam_30fps/training_labels_30fps/first_entry.npz"
 data = np.load(data_path)
 
 # Extract required parameters
-import ipdb;ipdb.set_trace()
 betas = torch.tensor(data["betas"][:10], dtype=torch.float32)  # Shape coefficients (only first 10)
 body_pose = torch.tensor(data["poses_cam"][3:66], dtype=torch.float32)  # Body pose (excluding global rotation)
 global_orient = torch.tensor(data["poses_cam"][:3], dtype=torch.float32)  # Global orientation
 transl = torch.tensor(data["trans_cam"]+data["cam_ext"][:3, 3], dtype=torch.float32)  # Translation
-import ipdb;ipdb.set_trace()
+
 # Create SMPL-X model
 smplx_model = make_smplx("supermotion")
 
@@ -37,7 +36,7 @@ image = torch.tensor(image).permute(2, 0, 1).unsqueeze(0)  # Convert to tensor (
 
 # Prepare rendering input
 render_dict = {
-    "K": torch.tensor(data["cam_int"][0]).unsqueeze(0),  # Camera intrinsics
+    "K": torch.tensor(data["cam_int"][:1]).unsqueeze(0),  # Camera intrinsics
     "faces": smplx_model.faces,  # SMPL-X mesh faces
     "verts": smplx_out.vertices,  # Generated vertices
     "background": image,  # Set this to an image if available
