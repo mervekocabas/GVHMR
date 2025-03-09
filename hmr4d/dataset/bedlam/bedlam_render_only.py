@@ -37,6 +37,7 @@ def load_background_image(image_path):
 def renderer(smplx_model, smpl_params_c, K, img_path):
     """Render a single frame."""
     # Generate mesh for the current frame
+    import ipdb;ipdb.set_trace()
     smplx_out = smplx_model(**smpl_params_c)
     
     # Load the corresponding background image
