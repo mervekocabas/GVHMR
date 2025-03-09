@@ -6,8 +6,7 @@ from hmr4d.utils.vis.renderer_utils import simple_render_mesh_background
 from hmr4d.utils.video_io_utils import read_video_np, save_video
 
 # Load BEDLAM data
-import ipdb;ipdb.set_trace()
-data_path = "20221010_3_1000_batch01hand.npz"
+data_path = "inputs/bedlam_30fps/training_labels_30fps/20221010_3_1000_batch01hand.npz"
 data = np.load(data_path)
 
 # Extract required parameters
@@ -17,6 +16,7 @@ global_orient = torch.tensor(data["poses_cam"][0][:3], dtype=torch.float32)  # G
 transl = torch.tensor(data["trans_cam"][0], dtype=torch.float32)  # Translation
 
 # Create SMPL-X model
+import ipdb;ipdb.set_trace()
 smplx_model = make_smplx("supermotion")
 
 # Generate mesh
@@ -37,7 +37,7 @@ render_dict = {
 
 # Render and save the result
 rendered_img = simple_render_mesh_background(render_dict)
-save_video(rendered_img, "bedlam_render.mp4", crf=23)
+save_video(rendered_img, "outputs/bedlam_render.mp4", crf=23)
 
 print("Rendering complete! Saved as 'bedlam_render.mp4'.")
 
