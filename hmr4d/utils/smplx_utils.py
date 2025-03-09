@@ -29,6 +29,7 @@ def make_smplx(type="neu_fullpose", **kwargs):
             "flat_hand_mean": False,
         }
         bm_kwargs.update(kwargs)
+        import ipdb;ipdb.set_trace()
         model = BodyModelSMPLX(model_path=PROJ_ROOT / "inputs/checkpoints/body_models", **bm_kwargs)
     elif type == "supermotion_EVAL3DPW":
         # SuperMotion is trained on BEDLAM dataset, the smplx config is the same except only 10 betas are used
