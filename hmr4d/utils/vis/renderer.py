@@ -35,7 +35,7 @@ def overlay_image_onto_background(image, mask, bbox, background):
     # copy() usage problem   
     if isinstance(background, torch.Tensor):
         background = background.detach().cpu().numpy()
-    import ipdb;ipdb.set_trace()
+    
     out_image = background.copy()
     bbox = bbox[0].int().cpu().numpy().copy()
     roi_image = out_image[bbox[1] : bbox[3], bbox[0] : bbox[2]]
@@ -233,11 +233,11 @@ class Renderer:
         )
 
         materials = Materials(device=self.device, specular_color=(colors,), shininess=0)
-
+        
         results = torch.flip(self.renderer(mesh, materials=materials, cameras=self.cameras, lights=self.lights), [1, 2])
         image = results[0, ..., :3] * 255
         mask = results[0, ..., -1] > 1e-3
-
+        import ipdb;ipdb.set_trace()
         if background is None:
             background = np.ones((self.height, self.width, 3)).astype(np.uint8) * 255
 
