@@ -36,7 +36,6 @@ def load_background_image(image_path):
 
 def renderer(smplx_model, smpl_params_c, K, img_path):
     """Render a single frame."""
-    import ipdb;ipdb.set_trace()
     # Generate mesh for the current frame
     smplx_out = smplx_model(**smpl_params_c)
     
@@ -57,7 +56,7 @@ def renderer(smplx_model, smpl_params_c, K, img_path):
 
     return rendered_img
 
-def create_video(data_path, output_dir, fps=30, crf=17):
+def create_video(data_path, output_dir, fps=30, crf=17, batch_size=32):
     """Load data, render frames, and create a video for each sequence."""
     
     # Read the sequence names from the .npz file (or can be inferred from image paths)
@@ -71,17 +70,23 @@ def create_video(data_path, output_dir, fps=30, crf=17):
         # Load sequence-specific data
         smplx_model, smpl_params_c, sequence_imgnames, K = data_loader(data_path, sequence_name)
         frames = []
-        
-        # Render frames for the current sequence
-        for img_path in sequence_imgnames:
-            # Render the current frame
-            img_path = Path("inputs/data/b0_all/20221010_3_1000_batch01hand/png") / img_path
-            import ipdb;ipdb.set_trace()
-            rendered_img = renderer(smplx_model, smpl_params_c, K, img_path)
-            rendered_img = np.clip(rendered_img, 0, 255).astype(np.uint8)  # Ensure image is in uint8 format
 
-            # Append the rendered image to the frames list
-            frames.append(rendered_img)
+        # Render frames in batches
+        for i in range(0, len(sequence_imgnames), batch_size):
+            batch_imgnames = sequence_imgnames[i:i+batch_size]  # Get a batch of image paths
+            batch_frames = []
+
+            for img_path in batch_imgnames:
+                # Render the current frame
+                img_path = Path("inputs/data/b0_all/20221010_3_1000_batch01hand/png") / img_path
+                rendered_img = renderer(smplx_model, smpl_params_c, K, img_path)
+                rendered_img = np.clip(rendered_img, 0, 255).astype(np.uint8)  # Ensure image is in uint8 format
+
+                # Append the rendered image to the batch list
+                batch_frames.append(rendered_img)
+
+            # Append the batch of frames to the overall frames list
+            frames.extend(batch_frames)
 
         # Define the output path for the video of the current sequence
         output_video_path = Path(output_dir) / f"{sequence_name}_rendered.mp4"
@@ -93,7 +98,7 @@ def create_video(data_path, output_dir, fps=30, crf=17):
 # Example usage
 data_path = "inputs/bedlam_30fps/training_labels_30fps/20221010_3_1000_batch01hand.npz"
 output_dir = "outputs/bedlam_render_videos"
-create_video(data_path, output_dir, fps=30, crf=17)
+create_video(data_path, output_dir, fps=30, crf=17, batch_size=10)
 
 '''
 #render only one image
