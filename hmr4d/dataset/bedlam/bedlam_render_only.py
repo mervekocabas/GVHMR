@@ -118,7 +118,7 @@ from concurrent.futures import ThreadPoolExecutor
 import cv2
 
 # Load BEDLAM data
-data_path = "inputs/bedlam_30fps/training_labels_30fps/20221010_3_1000_batch01hand.npz"
+data_path = "inputs/bedlam_30fps/training_labels_30fps/first_entry.npz"
 data = np.load(data_path)
 
 # Extract required parameters
