@@ -6,26 +6,26 @@ from hmr4d.utils.smplx_utils import make_smplx
 from hmr4d.utils.vis.renderer_utils import simple_render_mesh_background
 from hmr4d.utils.video_io_utils import save_video  # Import the save_video function
 
-def data_loader(data_path):
-    """Load data from the .npz file and prepare image paths."""
+def data_loader(data_path, sequence_name):
+    """Load data for a specific sequence from the .npz file."""
     data = np.load(data_path)
 
+    # Extract sequence-specific parameters from the data
+    sequence_imgnames = [imgname for imgname in data["imgnames"] if sequence_name in imgname]
+    import ipdb;ipdb.set_trace()
     # Extract parameters for SMPL-X
-    betas = torch.tensor(data["betas"][:10], dtype=torch.float32)
-    body_pose = torch.tensor(data["poses_cam"][3:66], dtype=torch.float32)
-    global_orient = torch.tensor(data["poses_cam"][:3], dtype=torch.float32)
-    transl = torch.tensor(data["trans_cam"] + data["cam_ext"][:3, 3], dtype=torch.float32)
-
-    # Extract image names (assuming 'imgnames' is the key for sequences)
-    imgnames = data["imgnames"]
+    betas = torch.tensor(data["betas"][:,:10], dtype=torch.float32)  # Shape coefficients (first 10)
+    body_pose = torch.tensor(data["poses_cam"][:,3:66], dtype=torch.float32)  # Body pose (excluding global rotation)
+    global_orient = torch.tensor(data["poses_cam"][:,:3], dtype=torch.float32)  # Global orientation
+    transl = torch.tensor(data["trans_cam"] + data["cam_ext"][:, :3, 3], dtype=torch.float32)  # Translation
 
     # Create SMPL-X model
     smplx_model = make_smplx("supermotion")
 
-    # Prepare camera intrinsics
+    # Camera intrinsics (assuming these are shared across sequences)
     K = torch.tensor(data["cam_int"]).unsqueeze(0)
 
-    return smplx_model, betas, body_pose, global_orient, transl, imgnames, K
+    return smplx_model, betas, body_pose, global_orient, transl, sequence_imgnames, K
 
 def load_background_image(image_path):
     """Load and process the background image."""
@@ -63,32 +63,23 @@ def renderer(smplx_model, betas, body_pose, global_orient, transl, K, img_path):
 
 def create_video(data_path, output_dir, fps=30, crf=17):
     """Load data, render frames, and create a video for each sequence."""
-    # Load data
-    smplx_model, betas, body_pose, global_orient, transl, imgnames, K = data_loader(data_path)
     
-    # Process each sequence (assuming 'imgnames' is split by sequences)
-    sequences = {}
-    current_sequence = []
-    sequence_name = None
-    
-    for imgname in imgnames:
-        # Determine sequence name (extract based on directory or sequence pattern)
-        sequence_name = imgname.split("/")[0]  # assuming 'seq_000000' is the sequence identifier
-        img_path = Path("inputs/data/b0_all/20221010_3_1000_batch01hand/png") / imgname  # Construct image path from sequence and name
-        
-        # Collect images for the current sequence
-        if sequence_name not in sequences:
-            sequences[sequence_name] = []
-        
-        sequences[sequence_name].append(img_path)
-    
-    # For each sequence, render frames and save as a video
-    for sequence_name, image_paths in sequences.items():
+    # Read the sequence names from the .npz file (or can be inferred from image paths)
+    data = np.load(data_path)
+    import ipdb;ipdb.set_trace()
+    sequence_names = set([imgname.split("/")[0] for imgname in data["imgnames"]])
+
+    # Process each sequence individually
+    for sequence_name in sequence_names:
         print(f"Processing sequence: {sequence_name}")
 
+        # Load sequence-specific data
+        smplx_model, betas, body_pose, global_orient, transl, sequence_imgnames, K = data_loader(data_path, sequence_name)
+        
         frames = []
         
-        for img_path in image_paths:
+        # Render frames for the current sequence
+        for img_path in sequence_imgnames:
             # Render the current frame
             rendered_img = renderer(smplx_model, betas, body_pose, global_orient, transl, K, img_path)
             rendered_img = np.clip(rendered_img, 0, 255).astype(np.uint8)  # Ensure image is in uint8 format
