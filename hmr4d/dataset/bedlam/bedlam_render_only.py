@@ -36,7 +36,7 @@ image = torch.tensor(image).permute(2, 0, 1).unsqueeze(0)  # Convert to tensor (
 
 # Prepare rendering input
 render_dict = {
-    "K": torch.tensor(data["cam_int"][:1]).unsqueeze(0),  # Camera intrinsics
+    "K": torch.tensor(data["cam_int"]).unsqueeze(0),  # Camera intrinsics
     "faces": smplx_model.faces,  # SMPL-X mesh faces
     "verts": smplx_out.vertices,  # Generated vertices
     "background": image,  # Set this to an image if available
