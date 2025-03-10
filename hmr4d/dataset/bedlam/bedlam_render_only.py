@@ -1,6 +1,7 @@
 
 import numpy as np
 import torch
+import os
 import cv2
 from pathlib import Path
 from hmr4d.utils.smplx_utils import make_smplx
@@ -70,7 +71,7 @@ def create_video(data_path, scene_name, output_dir, fps=30, crf=17):
 
     # Process each sequence individually
     for sequence_name in sequence_names:
-        print(f"Processing sequence: {sequence_name}")
+        print(f"Processing scene: {scene_name} sequence: {sequence_name}")
         
         # Load sequence-specific data
         smplx_model, smpl_params_c, sequence_imgnames, K = data_loader(data_path, sequence_name)
@@ -92,8 +93,9 @@ def create_video(data_path, scene_name, output_dir, fps=30, crf=17):
             frames.append(rendered_img)
 
         # Define the output path for the video of the current sequence
-        output_video_path = Path(output_dir) / f"{scene_name}/{sequence_name}/rendered.mp4"
-        
+        output_video_dir = Path(output_dir) / f"{scene_name}"
+        os.makedirs(output_video_dir, exist_ok=True) 
+        output_video_path = output_video_dir / f"{sequence_name}.mp4"
         # Save the video using the save_video function
         save_video(frames, output_video_path, fps=fps, crf=crf)
         print(f"Video for scene {scene_name} sequence {sequence_name} saved to {output_video_path}")
