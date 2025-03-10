@@ -73,6 +73,7 @@ def create_video(data_path, output_dir, fps=30, crf=17):
         frames = []
 
         for j, img_path in enumerate(sequence_imgnames):
+            import ipdb;ipdb.set_trace()
             # Extract only the parameters for the current frame
             smpl_params_single = {
                     "body_pose": smpl_params_c["body_pose"][j].unsqueeze(0),
@@ -94,7 +95,7 @@ def create_video(data_path, output_dir, fps=30, crf=17):
         print(f"Video for sequence {sequence_name} saved to {output_video_path}")
 
 # Example usage
-data_path = "inputs/bedlam_30fps/training_labels_30fps/seq_000001_data.npz"
+data_path = "inputs/bedlam_30fps/training_labels_30fps/20221010_3_1000_batch01hand.npz"
 output_dir = "outputs/bedlam_render_videos"
 create_video(data_path, output_dir, fps=30, crf=17)
 
