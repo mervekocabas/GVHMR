@@ -94,7 +94,7 @@ def create_video(data_path, output_dir, fps=30, crf=17):
         print(f"Video for sequence {sequence_name} saved to {output_video_path}")
 
 # Example usage
-data_path = "inputs/bedlam_30fps/training_labels_30fps/20221010_3_1000_batch01hand.npz"
+data_path = "inputs/bedlam_30fps/training_labels_30fps/seq0.npz"
 output_dir = "outputs/bedlam_render_videos"
 create_video(data_path, output_dir, fps=30, crf=17)
 
