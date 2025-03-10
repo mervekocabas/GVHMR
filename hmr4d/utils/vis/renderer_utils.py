@@ -31,7 +31,10 @@ def simple_render_mesh_background(render_dict, VI=50, colors=[0.8, 0.8, 0.8]):
 
     renderer = Renderer(width, height, device="cuda", faces=faces, K=K)
     outputs = []
-    for i in tqdm(range(len(verts)), desc=f"Rendering"):
+    #for i in tqdm(range(len(verts)), desc=f"Rendering"):
+    #    img = renderer.render_mesh(verts[i].cuda(), colors=colors, background=background[i], VI=VI)
+    #    outputs.append(img)
+    for i in range(len(verts)):
         img = renderer.render_mesh(verts[i].cuda(), colors=colors, background=background[i], VI=VI)
         outputs.append(img)
     outputs = np.stack(outputs, axis=0)
