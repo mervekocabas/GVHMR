@@ -1,4 +1,4 @@
-'''
+
 import numpy as np
 import torch
 import cv2
@@ -50,7 +50,7 @@ def renderer(smplx_model, smpl_params_c, K, img_path):
         "verts": smplx_out.vertices,  # Generated vertices
         "background": background,  # Set this to an image if available
     }
-    import ipdb; ipdb.set_trace()
+    
     # Render the image
     rendered_img = simple_render_mesh_background(render_dict)
     rendered_img = rendered_img.squeeze(0)  # Remove the batch dimension
@@ -152,7 +152,7 @@ render_dict = {
     "verts": smplx_out.vertices,  # Generated vertices
     "background": image_np,  # Set this to an image if available
 }
-import ipdb;ipdb.set_trace()
+
 # Render and save the result
 rendered_img = simple_render_mesh_background(render_dict)
 rendered_img = rendered_img.squeeze(0)  # This will remove the first dimension (1)
@@ -161,4 +161,4 @@ cv2.imwrite("outputs/bedlam_render.png", rendered_img)
 #save_video(rendered_img, "outputs/bedlam_render.png", crf=23)
 
 print("Rendering complete! Saved as 'bedlam_render.mp4'.")
-#'''
+'''
