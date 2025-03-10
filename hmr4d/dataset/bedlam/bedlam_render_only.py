@@ -72,26 +72,20 @@ def create_video(data_path, output_dir, fps=30, crf=17):
         smplx_model, smpl_params_c, sequence_imgnames, K = data_loader(data_path, sequence_name)
         frames = []
 
-        # Render frames in batches
-        for i in range(0, len(sequence_imgnames)):
-            batch_imgnames = sequence_imgnames[i:i+1]  # Get a batch of image paths
-            batch_frames = []
+        for j, img_path in enumerate(sequence_imgnames):
+            import ipdb;ipdb.set_trcae()
+            # Extract only the parameters for the current frame
+            smpl_params_single = {
+                    "body_pose": smpl_params_c["body_pose"][j].unsqueeze(0),
+                    "betas": smpl_params_c["betas"][j].unsqueeze(0),
+                    "transl": smpl_params_c["transl"][j].unsqueeze(0),
+                    "global_orient": smpl_params_c["global_orient"][j].unsqueeze(0),
+            }
 
-            for j, img_path in enumerate(batch_imgnames):
-                # Extract only the parameters for the current frame
-                smpl_params_single = {
-                    "body_pose": smpl_params_c["body_pose"][i + j].unsqueeze(0),
-                    "betas": smpl_params_c["betas"][i + j].unsqueeze(0),
-                    "transl": smpl_params_c["transl"][i + j].unsqueeze(0),
-                    "global_orient": smpl_params_c["global_orient"][i + j].unsqueeze(0),
-                }
-
-                img_path = Path("inputs/data/b0_all/20221010_3_1000_batch01hand/png") / img_path
-                rendered_img = renderer(smplx_model, smpl_params_single, K, img_path)
-                #rendered_img = np.clip(rendered_img, 0, 255).astype(np.uint8)
-                batch_frames.append(rendered_img)
-
-            frames.extend(batch_frames)
+            img_path = Path("inputs/data/b0_all/20221010_3_1000_batch01hand/png") / img_path
+            rendered_img = renderer(smplx_model, smpl_params_single, K, img_path)
+            #rendered_img = np.clip(rendered_img, 0, 255).astype(np.uint8)
+            frames.append(rendered_img)
 
         # Define the output path for the video of the current sequence
         output_video_path = Path(output_dir) / f"{sequence_name}_rendered.mp4"
