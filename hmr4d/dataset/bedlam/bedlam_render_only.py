@@ -73,7 +73,6 @@ def create_video(data_path, output_dir, fps=30, crf=17):
         frames = []
 
         for j, img_path in enumerate(sequence_imgnames):
-            import ipdb;ipdb.set_trace()
             # Extract only the parameters for the current frame
             smpl_params_single = {
                     "body_pose": smpl_params_c["body_pose"][j].unsqueeze(0),
