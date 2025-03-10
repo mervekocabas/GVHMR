@@ -7,6 +7,7 @@ from pathlib import Path
 from hmr4d.utils.smplx_utils import make_smplx
 from hmr4d.utils.vis.renderer_utils import simple_render_mesh_background
 from hmr4d.utils.video_io_utils import save_video  # Import the save_video function
+from tqdm import tqdm
 
 def data_loader(data_path, sequence_name):
     """Load data for a specific sequence from the .npz file."""
@@ -77,7 +78,7 @@ def create_video(data_path, scene_name, output_dir, fps=30, crf=17):
         smplx_model, smpl_params_c, sequence_imgnames, K = data_loader(data_path, sequence_name)
         frames = []
 
-        for j, img_path in enumerate(sequence_imgnames):
+        for j, img_path in tqdm(enumerate(sequence_imgnames), total=len(sequence_imgnames), desc=f"Processing {scene_name}"):
            
             # Extract only the parameters for the current frame
             smpl_params_single = {
@@ -91,7 +92,7 @@ def create_video(data_path, scene_name, output_dir, fps=30, crf=17):
             rendered_img = renderer(smplx_model, smpl_params_single, K, img_path)
             #rendered_img = np.clip(rendered_img, 0, 255).astype(np.uint8)
             frames.append(rendered_img)
-
+            
         # Define the output path for the video of the current sequence
         output_video_dir = Path(output_dir) / f"{scene_name}"
         os.makedirs(output_video_dir, exist_ok=True) 
