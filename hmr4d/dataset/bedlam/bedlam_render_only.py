@@ -13,18 +13,22 @@ def data_loader(data_path, sequence_name):
 
     # Extract sequence-specific parameters from the data
     sequence_imgnames = [imgname for imgname in data["imgnames"] if sequence_name in imgname]
-    
-    # Extract parameters for SMPL-X
-    betas = torch.tensor(data["betas"][:,:10], dtype=torch.float32)  # Shape coefficients (first 10)
-    body_pose = torch.tensor(data["poses_cam"][:,3:66], dtype=torch.float32)  # Body pose (excluding global rotation)
-    global_orient = torch.tensor(data["poses_cam"][:,:3], dtype=torch.float32)  # Global orientation
-    transl = torch.tensor(data["trans_cam"] + data["cam_ext"][:, :3, 3], dtype=torch.float32)  # Translation
+  
+    # Find the indices of the image names that match the sequence
+    indices = np.where(np.char.startswith(data['imgnames'], sequence_name))[0]
+
+    # Extract the relevant data for the sequence
+    betas = torch.tensor(data["betas"][indices, :10], dtype=torch.float32)  # Shape coefficients (first 10)
+    body_pose = torch.tensor(data["poses_cam"][indices, 3:66], dtype=torch.float32)  # Body pose (excluding global rotation)
+    global_orient = torch.tensor(data["poses_cam"][indices, :3], dtype=torch.float32)  # Global orientation
+    transl = torch.tensor(data["trans_cam"][indices] + data["cam_ext"][indices, :3, 3], dtype=torch.float32)  # Translation
+
     smpl_params_c = {"body_pose": body_pose, "betas": betas, "transl": transl, "global_orient": global_orient}
     # Create SMPL-X model
     smplx_model = make_smplx("supermotion")
 
     # Camera intrinsics (assuming these are shared across sequences)
-    K = torch.tensor(data["cam_int"][:1])
+    K = torch.tensor(data["cam_int"][indices[0]])
 
     return smplx_model, smpl_params_c, sequence_imgnames, K
 
@@ -73,7 +77,7 @@ def create_video(data_path, output_dir, fps=30, crf=17):
         frames = []
 
         for j, img_path in enumerate(sequence_imgnames):
-            import ipdb;ipdb.set_trace()
+           
             # Extract only the parameters for the current frame
             smpl_params_single = {
                     "body_pose": smpl_params_c["body_pose"][j].unsqueeze(0),
