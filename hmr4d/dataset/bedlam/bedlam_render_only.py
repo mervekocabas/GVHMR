@@ -89,7 +89,6 @@ def create_video(data_path, output_dir, fps=30, crf=17):
                 img_path = Path("inputs/data/b0_all/20221010_3_1000_batch01hand/png") / img_path
                 rendered_img = renderer(smplx_model, smpl_params_single, K, img_path)
                 #rendered_img = np.clip(rendered_img, 0, 255).astype(np.uint8)
-                import ipdb;ipdb.set_trace()
                 batch_frames.append(rendered_img)
 
             frames.extend(batch_frames)
