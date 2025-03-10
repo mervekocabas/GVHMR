@@ -61,7 +61,7 @@ def renderer(smplx_model, smpl_params_c, K, img_path):
 
     return rendered_img
 
-def create_video(data_path, output_dir, fps=30, crf=17):
+def create_video(data_path, scene_name, output_dir, fps=30, crf=17):
     """Load data, render frames, and create a video for each sequence."""
     
     # Read the sequence names from the .npz file (or can be inferred from image paths)
@@ -86,22 +86,57 @@ def create_video(data_path, output_dir, fps=30, crf=17):
                     "global_orient": smpl_params_c["global_orient"][j].unsqueeze(0),
             }
 
-            img_path = Path("inputs/data/b0_all/20221010_3_1000_batch01hand/png") / img_path
+            img_path = Path(f"inputs/data/b0_all/{scene_name}/png") / img_path
             rendered_img = renderer(smplx_model, smpl_params_single, K, img_path)
             #rendered_img = np.clip(rendered_img, 0, 255).astype(np.uint8)
             frames.append(rendered_img)
 
         # Define the output path for the video of the current sequence
-        output_video_path = Path(output_dir) / f"{sequence_name}_rendered.mp4"
+        output_video_path = Path(output_dir) / f"{scene_name}/{sequence_name}/rendered.mp4"
         
         # Save the video using the save_video function
         save_video(frames, output_video_path, fps=fps, crf=crf)
-        print(f"Video for sequence {sequence_name} saved to {output_video_path}")
+        print(f"Video for scene {scene_name} sequence {sequence_name} saved to {output_video_path}")
 
-# Example usage
-data_path = "inputs/bedlam_30fps/training_labels_30fps/20221010_3_1000_batch01hand.npz"
-output_dir = "outputs/bedlam_render_videos"
-create_video(data_path, output_dir, fps=30, crf=17)
+def iterate_dataset():
+    scene_names = [
+        "20221010_3_1000_batch01hand",
+        "20221010_3-10_500_batch01hand_zoom_suburb_d",
+        "20221011_1_250_batch01hand_closeup_suburb_a",
+        "20221011_1_250_batch01hand_closeup_suburb_b",
+        "20221011_1_250_batch01hand_closeup_suburb_c",
+        "20221011_1_250_batch01hand_closeup_suburb_d",
+        "20221012_1_500_batch01hand_closeup_highSchoolGym",
+        "20221012_3-10_500_batch01hand_zoom_highSchoolGym",
+        "20221013_3-10_500_batch01hand_static_highSchoolGym",
+        "20221013_3_250_batch01hand_orbit_bigOffice",
+        "20221013_3_250_batch01hand_static_bigOffice",
+        "20221014_3_250_batch01hand_orbit_archVizUI3_time15",
+        "20221015_3_250_batch01hand_orbit_archVizUI3_time10",
+        "20221015_3_250_batch01hand_orbit_archVizUI3_time12",
+        "20221015_3_250_batch01hand_orbit_archVizUI3_time19",
+        "20221017_3_1000_batch01hand",
+        "20221018_1_250_batch01hand_zoom_suburb_b",
+        "20221018_3_250_batch01hand_orbit_archVizUI3_time15",
+        "20221018_3-8_250_batch01hand",
+        "20221018_3-8_250_batch01hand_pitchDown52_stadium",
+        "20221018_3-8_250_batch01hand_pitchUp52_stadium",
+        "20221019_1_250_highbmihand_closeup_suburb_b",
+        "20221019_1_250_highbmihand_closeup_suburb_c",
+        "20221019_3_250_highbmihand",
+        "20221019_3-8_1000_highbmihand_static_suburb_d",
+        "20221019_3-8_250_highbmihand_orbit_stadium",
+        "20221020_3-8_250_highbmihand_zoom_highSchoolGym_a",
+        "20221022_3_250_batch01handhair_static_bigOffice",
+        "20221024_10_100_batch01handhair_zoom_suburb_d",
+        "20221024_3-10_100_batch01handhair_static_highSchoolGym"
+    ]
+    for scene_name in scene_names:
+        data_path = Path("inputs/bedlam_30fps/training_labels_30fps") / f"{scene_name}.npz"
+        output_dir = "outputs/bedlam_render_videos"
+        create_video(data_path, scene_name, output_dir, fps=30, crf=17)
+
+iterate_dataset()
 
 '''
 #render only one image
